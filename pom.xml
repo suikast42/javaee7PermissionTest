@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<artifactId>javaee7PermissionTest</artifactId>
-	<packaging>war</packaging>
+    <groupId>com.siemag.issuetest</groupId>
+    <artifactId>javaee7PermissionTest</artifactId>
+    <packaging>war</packaging>
     <version>1.0.0-SNAPSHOT</version>
-	<name>jpatest</name>
-
+    <name>javaee7PermissionTest</name>
 
 
     <properties>
-        <!--jboss production and test server path-->
+        <version-jboss>8.0.0.Final</version-jboss>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
         <jboss.test.dir>${env.IDE_HOME}/wildfly-${version-jboss}-testenv</jboss.test.dir>
+        <version-arquillian>1.1.2.Final</version-arquillian>
         <arquillian-profile></arquillian-profile>
+
+        <version-plugin-surefire>2.16</version-plugin-surefire>
     </properties>
     <build>
         <plugins>
@@ -20,19 +26,25 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <inherited>true</inherited>
                 <configuration>
+                    <!--<groups>-->
+                    <!--${includeGroups}-->
+                    <!--</groups>-->
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
                     <runOrder>alphabetical</runOrder>
                     <enableAssertions>true</enableAssertions>
                     <failIfNoTests>false</failIfNoTests>
                     <testFailureIgnore>true</testFailureIgnore>
                     <useFile>false</useFile>
-
                     <argLine>-Xms2048m -Xmx2048m -XX:MaxPermSize=256m -ea
                         -Dfile.encoding=${project.build.sourceEncoding}
                     </argLine>
                     <systemPropertyVariables>
                         <arquillian.launch>${arquillian-profile}</arquillian.launch>
                         <testServer>${jboss.test.dir}</testServer>
-                        <port.management>10009</port.management>
+                        <port.management>10000</port.management>
+                        <serverProfile>standalone-full-Test.xml</serverProfile>
                     </systemPropertyVariables>
                 </configuration>
                 <dependencies>
@@ -74,90 +86,102 @@
             </plugin>
         </plugins>
     </build>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jboss.arquillian</groupId>
+                <artifactId>arquillian-bom</artifactId>
+                <version>${version-arquillian}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-arquillian-container-managed</artifactId>
+                <version>${version-jboss}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-arquillian-container-remote</artifactId>
+                <version>${version-jboss}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
 
-	<dependencies>
+    </dependencyManagement>
+    <dependencies>
 
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>4.11</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
+            <version>1.3</version>
             <scope>test</scope>
         </dependency>
 
 
         <!-- Provided dependencies from parent -->
-		<dependency>
-			<groupId>org.jboss.spec</groupId>
-			<artifactId>jboss-javaee-6.0</artifactId>
-			<type>pom</type>
-		</dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>7.0</version>
+            <scope>provided</scope>
+        </dependency>
 
-		<!-- Compile dependencies from parent ( everything here will be copied in WEB_INF/lib -->
-		<dependency>
-			<groupId>org.primefaces</groupId>
-			<artifactId>primefaces</artifactId>
-		</dependency>
+        <!-- Compile dependencies from parent ( everything here will be copied in WEB_INF/lib -->
+        <dependency>
+            <groupId>org.primefaces</groupId>
+            <artifactId>primefaces</artifactId>
+            <version>4.0.8</version>
+        </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
+            <version>1.2.1</version>
             <scope>runtime</scope>
         </dependency>
-		<dependency>
-			<groupId>org.primefaces.extensions</groupId>
-			<artifactId>primefaces-extensions</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.primefaces.themes</groupId>
-			<artifactId>all-themes</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.primefaces.themes</groupId>
-			<artifactId>metroui</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.primefaces.extensions</groupId>
+            <artifactId>primefaces-extensions</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.primefaces.themes</groupId>
+            <artifactId>all-themes</artifactId>
+            <version>1.0.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.primefaces.themes</groupId>
+            <artifactId>metroui</artifactId>
+            <version>1.0</version>
+        </dependency>
 
-		<!-- Dependencies for pirme push -->
-		<dependency>
-			<groupId>org.atmosphere</groupId>
-			<artifactId>atmosphere-runtime</artifactId>
-			<exclusions>
-				<exclusion>
-					<artifactId>slf4j-api</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+        <!-- Dependencies for pirme push -->
+        <dependency>
+            <groupId>org.atmosphere</groupId>
+            <artifactId>atmosphere-runtime</artifactId>
+            <version>2.1.0</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<dependency>
-			<groupId>eu.infomas</groupId>
-			<artifactId>annotation-detector</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>eu.infomas</groupId>
+            <artifactId>annotation-detector</artifactId>
+            <version>3.0.0</version>
+        </dependency>
 
-		<!-- Dependencies for seam to have transaction in JSF -->
-			<!-- Deltaspike Core -->
-			<dependency>
-				<groupId>org.apache.deltaspike.core</groupId>
-				<artifactId>deltaspike-core-api</artifactId>
-			</dependency>
-
-			<dependency>
-				<groupId>org.apache.deltaspike.core</groupId>
-				<artifactId>deltaspike-core-impl</artifactId>
-			</dependency>
-
-			<!-- JPA Module -->
-			<dependency>
-				<groupId>org.apache.deltaspike.modules</groupId>
-				<artifactId>deltaspike-jpa-module-api</artifactId>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.deltaspike.modules</groupId>
-				<artifactId>deltaspike-jpa-module-impl</artifactId>
-			</dependency>
 
         <!-- Arquillian compile dependendcies. For building test packaged with MavenDependencyResolver API -->
 
@@ -172,7 +196,8 @@
         <dependency>
             <groupId>org.apache.xalan</groupId>
             <artifactId>serializer</artifactId>
-            <scope>compile</scope>
+            <version>2.7.1-1.jbossorg</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -186,10 +211,10 @@
             <artifactId>arquillian-junit-container</artifactId>
             <scope>compile</scope>
         </dependency>
-	</dependencies>
+    </dependencies>
 
 
-	<description>JPA Test</description>
+    <description>JPA Test</description>
 
     <profiles>
         <profile>
@@ -202,8 +227,8 @@
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>org.jboss.as</groupId>
-                    <artifactId>jboss-as-arquillian-container-remote</artifactId>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-arquillian-container-remote</artifactId>
                     <scope>test</scope>
                 </dependency>
 
@@ -219,8 +244,8 @@
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>org.jboss.as</groupId>
-                    <artifactId>jboss-as-arquillian-container-managed</artifactId>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-arquillian-container-managed</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
